@@ -32,9 +32,10 @@ def load_pairs_from_file(filepath: Path) -> list[tuple[str, str]]:
         print(f"  [WARN] Error loading {filepath}: {exc}")
         return []
 
-    pairs = getattr(module, "PAIRS", [])
+    # Try both PAIRS and EXPERT_PAIRS variable names
+    pairs = getattr(module, "PAIRS", None) or getattr(module, "EXPERT_PAIRS", [])
     if not isinstance(pairs, list):
-        print(f"  [WARN] {filepath} has PAIRS but it's not a list")
+        print(f"  [WARN] {filepath} has no PAIRS or EXPERT_PAIRS list")
         return []
 
     return [(str(nl).strip(), str(cmd).strip()) for nl, cmd in pairs if nl and cmd]
@@ -59,7 +60,9 @@ def main() -> None:
         print(f"No segments directory found at {segments_dir}")
         sys.exit(1)
 
-    segment_files = sorted(segments_dir.glob("*_pairs.py"))
+    segment_files = sorted(
+        list(segments_dir.glob("*_pairs.py")) + list(segments_dir.glob("segment_*.py"))
+    )
     if not segment_files:
         print(f"No *_pairs.py files found in {segments_dir}")
         sys.exit(1)

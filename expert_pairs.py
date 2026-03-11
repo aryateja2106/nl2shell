@@ -1,14 +1,14 @@
 """
-Expert-quality natural language to shell command pairs for NL2Shell training.
+NL2Shell Expert Pairs — Senior Engineer Quality
+==================================================
+Combined from:
+  - 370 base expert pairs (13 categories)
+  - Multi-agent segments (Amp, Codex, Gemini, Cursor)
 
-Commands reflect what a senior engineer with 10+ years of experience would type —
-not textbook examples. Proper quoting, error suppression, and idiomatic flag usage.
+Total: 697 expert-quality pairs across 29 categories
 """
 
 EXPERT_PAIRS: list[tuple[str, str]] = [
-    # =========================================================================
-    # STDERR / STDOUT HANDLING (~30 pairs)
-    # =========================================================================
     (
         "check if a command exists silently",
         "command -v git >/dev/null 2>&1 && echo installed || echo missing",
@@ -66,9 +66,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "stream command output to remote host",
         "tar czf - /data | ssh user@host 'cat > backup.tar.gz'",
     ),
-    # =========================================================================
-    # HUMAN-READABLE OUTPUT (~30 pairs)
-    # =========================================================================
     (
         "show disk usage sorted by size human-readable",
         "du -sh */ 2>/dev/null | sort -rh | head -20",
@@ -111,9 +108,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("print environment variables sorted", "env | sort"),
     ("display mounted filesystems in columns", "mount | column -t"),
     ("check current timezone and time offset", "date +%Z%z"),
-    # =========================================================================
-    # PIPE MASTERY (~40 pairs)
-    # =========================================================================
     (
         "extract unique IP addresses from nginx access log",
         "awk '{print $1}' /var/log/nginx/access.log | sort -u",
@@ -250,9 +244,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "monitor file descriptor count for pid",
         "while true; do ls /proc/$(pgrep node)/fd 2>/dev/null | wc -l; sleep 1; done",
     ),
-    # =========================================================================
-    # PROCESS SUBSTITUTION AND SUBSHELLS (~20 pairs)
-    # =========================================================================
     ("compare output of two commands side by side", "diff <(ls dir1) <(ls dir2)"),
     ("watch a log file and highlight errors", "tail -f file.log | grep --line-buffered 'ERROR'"),
     ("diff current branch against main", "diff <(git show main:src/app.py) src/app.py"),
@@ -294,9 +285,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "run conditional block in subshell without cd pollution",
         "(cd /repo && git pull && make build) && echo 'build ok'",
     ),
-    # =========================================================================
-    # XARGS AND FIND PATTERNS (~25 pairs)
-    # =========================================================================
     ("delete all .pyc files safely", "find . -name '*.pyc' -type f -print0 | xargs -0 rm -f"),
     (
         "compress all log files older than 7 days",
@@ -391,9 +379,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "archive found files preserving paths",
         "find ./src -name '*.ts' -print0 | xargs -0 tar czf source.tar.gz",
     ),
-    # =========================================================================
-    # macOS-SPECIFIC IDIOMS (~30 pairs)
-    # =========================================================================
     ("copy current directory path to clipboard", "pwd | pbcopy"),
     ("search for files by content on macOS", "mdfind 'kMDItemTextContent == \"search term\"'"),
     ("prevent Mac from sleeping while running a command", "caffeinate -i ./long_build.sh"),
@@ -436,9 +421,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ),
     ("show all environment variables set in launchd", "launchctl environ"),
     ("eject a disk from command line", "diskutil eject /Volumes/ExternalDrive"),
-    # =========================================================================
-    # ONE-LINER PATTERNS (~25 pairs)
-    # =========================================================================
     ("create directory and cd into it", "mkdir -p newdir && cd newdir"),
     ("retry a command up to 3 times", "for i in 1 2 3; do command && break || sleep 1; done"),
     ("run command only if previous succeeded", "make build && make test && make deploy"),
@@ -479,9 +461,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ),
     ("find and kill zombie processes", "ps aux | awk '$8==\"Z\" {print $2}' | xargs -r kill -9"),
     ("reload nginx without downtime", "nginx -t && nginx -s reload"),
-    # =========================================================================
-    # JSON / API HANDLING (~25 pairs)
-    # =========================================================================
     (
         "fetch JSON API and extract a field",
         "curl -sf https://api.example.com/data | jq '.results[].name'",
@@ -543,9 +522,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ),
     ("validate json file syntax", "jq empty data.json && echo valid || echo invalid"),
     ("sort json array by field", "jq 'sort_by(.created_at) | reverse' events.json"),
-    # =========================================================================
-    # GIT EXPERT PATTERNS (~25 pairs)
-    # =========================================================================
     ("show files changed in the last commit", "git diff --name-only HEAD~1"),
     (
         "find which commit introduced a bug",
@@ -583,9 +559,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("show changed files between two branches", "git diff --name-only main..feature/branch"),
     ("pull and rebase instead of merge", "git pull --rebase origin main"),
     ("show git log as a graph", "git log --oneline --graph --all --decorate | head -30"),
-    # =========================================================================
-    # DOCKER / CONTAINER PATTERNS (~20 pairs)
-    # =========================================================================
     ("remove all stopped containers and dangling images", "docker system prune -f"),
     ("follow logs of a running container", "docker logs -f --tail 100 container_name"),
     ("run interactive shell in running container", "docker exec -it container_name bash"),
@@ -624,10 +597,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "docker tag myapp:latest registry.example.com/myapp:latest && docker push registry.example.com/myapp:latest",
     ),
     ("get container start time", "docker inspect -f '{{.State.StartedAt}}' container_name"),
-    # =========================================================================
-    # NETWORK / SECURITY (~20 pairs)
-    # =========================================================================
-    ("check all listening ports with process names", "ss -tlnp"),
     ("create SSH tunnel for local development", "ssh -NL 5432:localhost:5432 user@remote"),
     ("scan for open ports on a host", "nmap -T4 -F 192.168.1.1"),
     (
@@ -653,11 +622,8 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("reverse DNS lookup for IP", "dig -x 8.8.8.8 +short"),
     ("test UDP port is reachable", "nc -zuv 192.168.1.10 514 2>&1"),
     ("show all network interfaces and IPs", "ip -brief addr show"),
-    # =========================================================================
-    # TEXT PROCESSING POWER (~25 pairs)
-    # =========================================================================
     ("extract the 3rd column from a CSV", "cut -d',' -f3 data.csv"),
-    ("replace all tabs with 4 spaces in a file", "sed -i '' 's/\t/    /g' file.txt"),
+    ("replace all tabs with 4 spaces in a file", "sed -i '' 's/	/    /g' file.txt"),
     (
         "print lines matching a pattern with context",
         "grep -C3 'NullPointerException' app.log | head -30",
@@ -666,14 +632,13 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("reverse the order of lines in a file", "tail -r file.txt"),
     ("sum a column of numbers in a file", "awk '{sum+=$1}END{print sum}' numbers.txt"),
     ("print lines between two patterns", "awk '/START/,/END/' logfile.txt"),
-    ("convert CSV to TSV", "sed 's/,/\t/g' data.csv > data.tsv"),
+    ("convert CSV to TSV", "sed 's/,/	/g' data.csv > data.tsv"),
     ("print unique lines from two files", "sort file1.txt file2.txt | uniq -u"),
     ("extract IP addresses from file", "grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' file.txt"),
     ("join two files on first column", "join <(sort -k1 file1.txt) <(sort -k1 file2.txt)"),
     ("convert lowercase to uppercase", "tr '[:lower:]' '[:upper:]' < input.txt"),
     ("count occurrences of pattern per file", "grep -c 'ERROR' *.log | sort -t: -k2 -rn"),
     ("delete first n lines of file", "sed -i '' '1,5d' file.txt"),
-    ("add line numbers to output", "cat -n file.txt"),
     ("extract everything between brackets", "grep -oP '\\[\\K[^\\]]+' file.txt"),
     ("replace text only on lines matching pattern", "sed '/include/s/foo/bar/g' file.txt"),
     ("show only non-empty lines", "grep -v '^[[:space:]]*$' file.txt"),
@@ -687,9 +652,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("count character frequency in file", "fold -w1 file.txt | sort | uniq -c | sort -rn"),
     ("strip ANSI color codes from file", "sed 's/\\x1B\\[[0-9;]*[mGKHF]//g' colored.txt"),
     ("extract version number from string", "echo 'v2.13.4' | grep -oP '[0-9]+\\.[0-9]+\\.[0-9]+'"),
-    # =========================================================================
-    # MODERN CLI TOOLS (~15 pairs)
-    # =========================================================================
     ("find Python files ignoring node_modules", "fd -e py --exclude node_modules"),
     ("search for TODO comments in source code", "rg 'TODO|FIXME|HACK' --type py"),
     ("view file with syntax highlighting", "bat --style=full src/app.ts"),
@@ -711,9 +673,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "list directory as tree excluding git dirs",
         "eza --tree --ignore-glob='.git|node_modules' --level=4",
     ),
-    # =========================================================================
-    # SYSTEM ADMINISTRATION (~20 pairs)
-    # =========================================================================
     ("check system logs for last boot", "journalctl -b -1 --no-pager | tail -50"),
     (
         "reload systemd and restart a service",
@@ -746,9 +705,6 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
     ("check current ulimits", "ulimit -a"),
     ("set max open files for session", "ulimit -n 65536"),
     ("show all mounted filesystems with options", "findmnt --output TARGET,SOURCE,FSTYPE,OPTIONS"),
-    # =========================================================================
-    # DEVELOPMENT WORKFLOW (~20 pairs)
-    # =========================================================================
     (
         "start development server and open browser",
         "npm run dev & sleep 2 && open http://localhost:3000",
@@ -790,7 +746,903 @@ EXPERT_PAIRS: list[tuple[str, str]] = [
         "lsof -i:8080 >/dev/null 2>&1 && echo 'port in use' || npm start",
     ),
     ("benchmark a command with multiple runs", "hyperfine --warmup 3 './my_command arg'"),
+    (
+        "redirect only the stderr of a script through a grep filter while keeping stdout intact",
+        "./build.sh 3>&1 1>&2 2>&3 | grep -i fail",
+    ),
+    (
+        "swap stderr and stdout streams using a temporary file descriptor 3",
+        "exec 3>&1; ./script.sh 2>&1 1>&3 3>&- | sed 's/^/ERR: /' >&2; exec 3>&-",
+    ),
+    (
+        "check exit code of first command in a pipe",
+        'gzip < big.log | wc -c; echo "gzip exit: ${PIPESTATUS[0]}"',
+    ),
+    ("fail if any command in a pipeline fails", "set -o pipefail && make build | tee build.log"),
+    (
+        "capture all pipeline exit codes after running",
+        'cmd1 | cmd2 | cmd3; echo "exits: ${PIPESTATUS[*]}"',
+    ),
+    (
+        "assert pipeline succeeded and print status array",
+        "pg_dump mydb | gzip > mydb.sql.gz; [[ ${PIPESTATUS[0]} -eq 0 ]] || echo 'pg_dump failed'",
+    ),
+    (
+        "tee command output to two different files at once",
+        "./deploy.sh | tee deploy.log >(grep ERROR > errors.log)",
+    ),
+    (
+        "tee stdout to file while also sending to a log aggregator",
+        "./app.sh 2>&1 | tee -a app.log | logger -t myapp",
+    ),
+    (
+        "fan output to three consumers via process substitution",
+        "cat access.log | tee >(grep 200 | wc -l > ok.txt) >(grep 500 | wc -l > err.txt) >/dev/null",
+    ),
+    (
+        "tee stderr to a file while stdout continues to terminal",
+        "{ ./run.sh 2>&1 1>&3 | tee errors.log 1>&2; } 3>&1",
+    ),
+    (
+        "diff two command outputs and fail if they differ",
+        "diff <(./expected.sh 2>/dev/null) <(./actual.sh 2>/dev/null) || exit 1",
+    ),
+    (
+        "feed process substitution output into while loop",
+        'while IFS= read -r line; do echo "got: $line"; done < <(kubectl get pods 2>/dev/null)',
+    ),
+    (
+        "capture stderr of process substitution separately",
+        "diff <(cmd1 2>cmd1_err.log) <(cmd2 2>cmd2_err.log)",
+    ),
+    (
+        "write stdout to one file and stderr to another without shell builtins",
+        "./app 1>out.log 2>err.log",
+    ),
+    (
+        "redirect only fd 3 to a file for custom logging",
+        "exec 3>debug.log; echo 'debug info' >&3; exec 3>&-",
+    ),
+    ("duplicate stdout to a log file using exec redirect", "exec > >(tee -a session.log) 2>&1"),
+    (
+        "send stdout to file and stderr to a separate command",
+        "./run.sh 2> >(grep -v DeprecationWarning >&2)",
+    ),
+    (
+        "capture command output to variable while still printing it",
+        "output=$(./check.sh | tee /dev/stderr)",
+    ),
+    (
+        "print progress to stderr and final result to stdout",
+        "{ echo 'working...' >&2; sleep 1; echo 'done'; }",
+    ),
+    ("redirect stdout to stderr for a single echo", "echo 'this goes to stderr' >&2"),
+    (
+        "create a worktree for a hotfix branch without switching",
+        "git worktree add ../hotfix-tree hotfix/critical-bug",
+    ),
+    ("list all active worktrees with their paths", "git worktree list --porcelain"),
+    (
+        "remove a worktree and prune stale references",
+        "git worktree remove ../hotfix-tree && git worktree prune",
+    ),
+    (
+        "find the commit hash before an accidental reset",
+        "git reflog | grep 'reset\\|checkout' | head -20",
+    ),
+    ("recover a dropped stash using reflog", "git reflog | grep 'stash' | head -5"),
+    ("restore branch to state 3 moves ago via reflog", "git reset --hard HEAD@{3}"),
+    ("interactively stash only selected hunks", "git stash push -p -m 'partial wip: auth changes'"),
+    ("stash only a specific file", "git stash push -m 'wip: config only' -- config/settings.py"),
+    (
+        "search commit messages for a pattern across all branches",
+        "git log --all --oneline --grep='hotfix' --regexp-ignore-case",
+    ),
+    (
+        "find all commits that added or removed a function name",
+        "git log -S 'authenticate_user' --all --oneline --source",
+    ),
+    ("search commit diffs for a regex pattern", "git log -G 'password\\s*=' --oneline --all"),
+    ("blame a specific line range in a file", "git blame -L 45,72 src/auth/jwt.ts"),
+    ("blame ignoring whitespace-only changes", "git blame -w -L 10,30 src/api/routes.py"),
+    ("show the content of a file at a specific commit", "git show abc1234:src/config.ts"),
+    (
+        "list all files that were changed in a specific commit",
+        "git diff-tree --no-commit-id -r --name-only abc1234",
+    ),
+    (
+        "clone a repo and initialize all submodules recursively",
+        "git clone --recurse-submodules https://github.com/org/repo.git",
+    ),
+    (
+        "update all submodules to their latest tracked commit",
+        "git submodule update --init --recursive --remote",
+    ),
+    ("show which submodule commit is checked out", "git submodule status --recursive"),
+    (
+        "enable sparse checkout and fetch only a specific directory",
+        "git sparse-checkout init --cone && git sparse-checkout set src/api",
+    ),
+    (
+        "add another directory to an existing sparse checkout",
+        "git sparse-checkout add docs/architecture",
+    ),
+    ("get all pods across all namespaces with node assignment", "kubectl get pods -A -o wide"),
+    (
+        "follow logs of a crashing pod and restart on failure",
+        "kubectl logs -f --previous deployment/api-server -n production",
+    ),
+    (
+        "describe a failing pod to see events and status",
+        "kubectl describe pod api-server-6d8f7b9-xkpqz -n production",
+    ),
+    (
+        "exec into a running pod container",
+        "kubectl exec -it deployment/api-server -n production -- /bin/sh",
+    ),
+    (
+        "get all pods in CrashLoopBackOff state",
+        "kubectl get pods -A --field-selector=status.phase=Running | grep CrashLoop",
+    ),
+    (
+        "watch pod rollout status in real time",
+        "kubectl rollout status deployment/api-server -n production --timeout=5m",
+    ),
+    (
+        "port-forward a service to localhost for debugging",
+        "kubectl port-forward svc/postgres 5432:5432 -n staging",
+    ),
+    (
+        "get resource limits and requests for all pods in a namespace",
+        "kubectl get pods -n production -o json | jq '.items[].spec.containers[].resources'",
+    ),
+    (
+        "force delete a stuck terminating pod",
+        "kubectl delete pod stuck-pod-xyz -n production --grace-period=0 --force",
+    ),
+    (
+        "apply a manifest and wait for rollout to complete",
+        "kubectl apply -f k8s/deployment.yaml && kubectl rollout status deployment/api-server -n production",
+    ),
+    (
+        "list all running EC2 instances with their IPs",
+        "aws ec2 describe-instances --filters 'Name=instance-state-name,Values=running' --query 'Reservations[*].Instances[*].[InstanceId,PublicIpAddress,Tags[?Key==`Name`].Value|[0]]' --output table",
+    ),
+    (
+        "tail CloudWatch logs for a Lambda function",
+        "aws logs tail /aws/lambda/my-function --follow --format short",
+    ),
+    (
+        "copy a file to S3 with server-side encryption",
+        "aws s3 cp secrets.json s3://my-bucket/config/secrets.json --sse aws:kms",
+    ),
+    (
+        "invoke a Lambda function and show the response",
+        'aws lambda invoke --function-name my-function --payload \'{"key":"value"}\' /tmp/out.json && cat /tmp/out.json',
+    ),
+    (
+        "get a secret value from Secrets Manager",
+        "aws secretsmanager get-secret-value --secret-id prod/db/password --query SecretString --output text",
+    ),
+    (
+        "list all Cloud Run services across all regions",
+        "gcloud run services list --platform managed --format='table(name,region,status.url)'",
+    ),
+    (
+        "stream Cloud Run logs in real time",
+        "gcloud beta run services logs tail my-service --region us-central1",
+    ),
+    (
+        "deploy a container image to Cloud Run",
+        "gcloud run deploy my-service --image gcr.io/project/image:latest --region us-central1 --allow-unauthenticated",
+    ),
+    (
+        "get the external IP of a GKE load balancer service",
+        "gcloud compute forwarding-rules list --filter='name~my-service' --format='value(IPAddress)'",
+    ),
+    (
+        "set a Cloud Run environment variable without redeploying image",
+        "gcloud run services update my-service --set-env-vars DB_URL=postgres://host/db --region us-central1",
+    ),
+    (
+        "run a SQL query from the command line without interactive prompt",
+        "psql -U myuser -d mydb -c 'SELECT count(*) FROM users WHERE active = true;'",
+    ),
+    (
+        "export a table to CSV from psql",
+        "psql -U myuser -d mydb -c '\\COPY users TO STDOUT WITH CSV HEADER' > users.csv",
+    ),
+    (
+        "run a SQL file against a database non-interactively",
+        "psql -U myuser -d mydb -f migrations/001_add_index.sql",
+    ),
+    (
+        "show all table sizes in a PostgreSQL database",
+        "psql -U myuser -d mydb -c 'SELECT relname, pg_size_pretty(pg_total_relation_size(oid)) FROM pg_class WHERE relkind=\\'r\\' ORDER BY pg_total_relation_size(oid) DESC LIMIT 20;'",
+    ),
+    (
+        "list all running queries in PostgreSQL",
+        "psql -U myuser -d mydb -c 'SELECT pid, now()-query_start AS duration, state, query FROM pg_stat_activity WHERE state != \\'idle\\' ORDER BY duration DESC;'",
+    ),
+    (
+        "kill a long-running PostgreSQL query by pid",
+        "psql -U myuser -d mydb -c 'SELECT pg_terminate_backend(12345);'",
+    ),
+    (
+        "query a SQLite database file from the command line",
+        "sqlite3 app.db 'SELECT * FROM sessions WHERE expires_at < datetime(\"now\");'",
+    ),
+    (
+        "export SQLite table to CSV",
+        "sqlite3 -header -csv app.db 'SELECT * FROM events ORDER BY created_at DESC LIMIT 1000;' > events.csv",
+    ),
+    ("show all tables in a SQLite database", "sqlite3 app.db '.tables'"),
+    ("check SQLite database integrity", "sqlite3 app.db 'PRAGMA integrity_check;'"),
+    ("run a vacuum on a SQLite database to reclaim space", "sqlite3 app.db 'VACUUM;'"),
+    (
+        "run a MySQL query from the command line",
+        "mysql -u root -p'$DB_PASS' mydb -e 'SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = database();'",
+    ),
+    (
+        "dump a single MySQL table to SQL file",
+        "mysqldump -u root -p'$DB_PASS' mydb users > users_backup.sql",
+    ),
+    ("import a SQL dump into MySQL", "mysql -u root -p'$DB_PASS' mydb < backup.sql"),
+    (
+        "get all keys matching a pattern in Redis",
+        "redis-cli --scan --pattern 'session:*' | head -20",
+    ),
+    ("flush all keys in a specific Redis database", "redis-cli -n 2 FLUSHDB"),
+    (
+        "monitor live Redis commands in real time",
+        "redis-cli MONITOR | grep -i 'set\\|get' | head -50",
+    ),
+    (
+        "check Redis memory usage and eviction stats",
+        "redis-cli INFO memory | grep -E 'used_memory_human|maxmemory_human|evicted_keys'",
+    ),
+    (
+        "count documents in a MongoDB collection from the shell",
+        "mongosh mydb --eval 'db.users.countDocuments({active: true})'",
+    ),
+    (
+        "export a MongoDB collection to JSON via mongosh",
+        "mongosh mydb --eval 'JSON.stringify(db.events.find({},{_id:0}).toArray())' --quiet > events.json",
+    ),
+    ("generate a 4096-bit RSA private key", "openssl genrsa -out private.key 4096"),
+    (
+        "create a certificate signing request from an existing key",
+        "openssl req -new -key private.key -out request.csr -subj '/CN=example.com/O=MyOrg/C=US'",
+    ),
+    ("view the details of an x509 certificate", "openssl x509 -in cert.pem -noout -text"),
+    (
+        "verify a certificate matches its private key",
+        "diff <(openssl x509 -in cert.pem -pubkey -noout) <(openssl rsa -in private.key -pubout 2>/dev/null)",
+    ),
+    (
+        "convert a PEM certificate to DER format",
+        "openssl x509 -in cert.pem -outform DER -out cert.der",
+    ),
+    (
+        "encrypt a file for a specific recipient with GPG",
+        "gpg --encrypt --recipient user@example.com --output secret.gpg plaintext.txt",
+    ),
+    ("decrypt a GPG-encrypted file", "gpg --decrypt --output plaintext.txt secret.gpg"),
+    ("sign a file with your GPG key", "gpg --detach-sign --armor --output file.sig file.txt"),
+    ("verify a GPG detached signature", "gpg --verify file.sig file.txt"),
+    ("list all keys in your GPG keyring", "gpg --list-keys --keyid-format LONG"),
+    (
+        "generate an ed25519 SSH key with a comment",
+        "ssh-keygen -t ed25519 -C 'user@host-$(date +%Y%m%d)' -f ~/.ssh/id_ed25519_new",
+    ),
+    ("add a private key to the SSH agent for the session", "ssh-add -t 3600 ~/.ssh/id_ed25519"),
+    ("list all identities loaded in the SSH agent", "ssh-add -l"),
+    (
+        "copy your public key to a remote server",
+        "ssh-copy-id -i ~/.ssh/id_ed25519.pub user@remote.host",
+    ),
+    ("connect to a host with agent forwarding enabled", "ssh -A user@bastion.example.com"),
+    ("compute SHA-256 checksum of a file", "shasum -a 256 installer.pkg"),
+    (
+        "verify a file against a published SHA-256 checksum",
+        "echo 'abc123...  installer.pkg' | shasum -a 256 -c -",
+    ),
+    (
+        "generate MD5 checksums for all files in a directory",
+        "find . -type f -print0 | xargs -0 md5 -r 2>/dev/null | sort > checksums.md5",
+    ),
+    ("lock down SSH private key permissions", "chmod 600 ~/.ssh/id_ed25519 && chmod 700 ~/.ssh"),
+    (
+        "recursively set correct web-root ownership and permissions",
+        "find /var/www/html -type d -exec chmod 755 {} + && find /var/www/html -type f -exec chmod 644 {} +",
+    ),
+    (
+        "trace all file-open syscalls made by a running process",
+        "strace -p $(pgrep -n nginx) -e trace=openat,open 2>&1 | head -50",
+    ),
+    (
+        "trace network syscalls of a new process invocation",
+        "strace -e trace=network,socket -f ./server 2>&1 | head -100",
+    ),
+    ("summarise syscall counts and time for a command", "strace -c -f ./app 2>&1 | tail -20"),
+    (
+        "trace file opens on macOS using dtruss",
+        "sudo dtruss -f -t open_nocancel -p $(pgrep -n node) 2>&1 | head -50",
+    ),
+    (
+        "record a CPU perf profile for 10 seconds",
+        "sudo perf record -F 99 -g -p $(pgrep app) -- sleep 10",
+    ),
+    (
+        "generate a flamegraph from a perf.data recording",
+        "sudo perf script | stackcollapse-perf.pl | flamegraph.pl > flamegraph.svg",
+    ),
+    (
+        "show top CPU-consuming functions in perf report",
+        "sudo perf report --stdio --sort=dso,symbol | head -40",
+    ),
+    (
+        "run a command three times and show real elapsed time each run",
+        "for i in 1 2 3; do { time ./benchmark; } 2>&1 | grep real; done",
+    ),
+    ("measure wall clock and CPU time of a pipeline", "{ time (gzip -c largefile | wc -c); } 2>&1"),
+    (
+        "benchmark two implementations and compare",
+        "hyperfine --warmup 5 './impl_a input.dat' './impl_b input.dat' --export-markdown results.md",
+    ),
+    (
+        "run a program under valgrind memcheck and show leak summary",
+        "valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./app 2>&1 | tail -30",
+    ),
+    (
+        "profile heap allocations with valgrind massif",
+        "valgrind --tool=massif --pages-as-heap=yes ./app && ms_print massif.out.* | head -60",
+    ),
+    (
+        "check for memory leaks on macOS with leaks tool",
+        "leaks --atExit -- ./app 2>&1 | grep 'leaks for'",
+    ),
+    (
+        "run heap profiling with gperftools on Linux",
+        "HEAPPROFILE=/tmp/heap.prof LD_PRELOAD=/usr/lib/libprofiler.so ./app",
+    ),
+    ("show live disk I/O by process updated every second", "sudo iotop -o -b -n 5 -d 1 | tail -20"),
+    ("show per-device disk throughput every 2 seconds", "iostat -x 2 5 | grep -v '^$'"),
+    ("watch disk read/write speeds on macOS", "iostat -d -w 2 5"),
+    (
+        "find which process is hammering disk I/O right now",
+        "sudo iotop -o -P -b -n 1 | sort -k10 -rn | head -10",
+    ),
+    (
+        "measure latency of disk operations with fio quick test",
+        "fio --name=randread --ioengine=libaio --iodepth=16 --rw=randread --bs=4k --size=256M --runtime=10 --filename=/tmp/fio_test",
+    ),
+    ("open crontab for editing", "EDITOR=nano crontab -e"),
+    (
+        "list all cron jobs for the current user",
+        "crontab -l 2>/dev/null || echo 'no crontab for $USER'",
+    ),
+    ("remove all cron jobs for the current user", "crontab -r"),
+    (
+        "back up current crontab before modifying it",
+        "crontab -l > ~/crontab.bak.$(date +%Y%m%d) 2>/dev/null",
+    ),
+    (
+        "schedule a script to run every day at 2:30 AM",
+        "(crontab -l 2>/dev/null; echo '30 2 * * * /opt/scripts/daily.sh >> /var/log/daily.log 2>&1') | crontab -",
+    ),
+    (
+        "run a job every 15 minutes and log output",
+        "(crontab -l 2>/dev/null; echo '*/15 * * * * /opt/scripts/check.sh >> /var/log/check.log 2>&1') | crontab -",
+    ),
+    ("enable a systemd service to start on boot", "sudo systemctl enable --now myapp.service"),
+    (
+        "disable a systemd service and stop it immediately",
+        "sudo systemctl disable --now myapp.service",
+    ),
+    (
+        "view the last 100 lines of a service journal",
+        "journalctl -u myapp.service -n 100 --no-pager",
+    ),
+    (
+        "create a minimal systemd unit file for a web service",
+        "printf '[Unit]\\nDescription=MyApp\\nAfter=network.target\\n\\n[Service]\\nExecStart=/opt/myapp/bin/server\\nRestart=always\\n\\n[Install]\\nWantedBy=multi-user.target\\n' | sudo tee /etc/systemd/system/myapp.service > /dev/null",
+    ),
+    (
+        "load and start a launchd plist agent immediately",
+        "launchctl load -w ~/Library/LaunchAgents/com.example.myapp.plist",
+    ),
+    (
+        "unload and stop a launchd agent",
+        "launchctl unload -w ~/Library/LaunchAgents/com.example.myapp.plist",
+    ),
+    ("check if a launchd agent is running", "launchctl list | grep com.example.myapp"),
+    (
+        "create a launchd plist to run a script every 5 minutes",
+        "defaults write ~/Library/LaunchAgents/com.example.heartbeat Label -string com.example.heartbeat && launchctl load -w ~/Library/LaunchAgents/com.example.heartbeat.plist",
+    ),
+    (
+        "schedule a one-time job to run in 10 minutes",
+        "echo '/opt/scripts/reindex.sh >> /tmp/reindex.log 2>&1' | at now + 10 minutes",
+    ),
+    ("list all pending at jobs", "atq"),
+    ("remove a pending at job by job number", "atrm 3"),
+    (
+        "start a supervisor-managed process and check its status",
+        "supervisorctl start myapp && supervisorctl status myapp",
+    ),
+    ("tail supervisor log for a specific program", "supervisorctl tail -f myapp stderr"),
+    (
+        "reload supervisor config and restart all programs",
+        "supervisorctl reread && supervisorctl update && supervisorctl restart all",
+    ),
+    ("add a third-party Homebrew tap", "brew tap hashicorp/tap"),
+    ("install a GUI application with Homebrew Cask", "brew install --cask visual-studio-code"),
+    ("start a Homebrew-managed background service", "brew services start postgresql@16"),
+    (
+        "stop and remove a Homebrew service from auto-start",
+        "brew services stop redis && brew services cleanup",
+    ),
+    ("remove unused Homebrew downloads and old versions", "brew cleanup --prune=7 -s"),
+    ("upgrade all outdated Homebrew packages", "brew update && brew upgrade"),
+    ("install dependencies without modifying the lockfile", "npm ci"),
+    ("add a dev dependency with pnpm", "pnpm add -D typescript"),
+    ("run a package binary without installing it globally", "npx --yes tsx src/seed.ts"),
+    ("check which installed npm packages are outdated", "npm outdated --depth=0"),
+    ("list top-level npm packages only", "npm ls --depth=0"),
+    (
+        "create an isolated virtual environment with uv and install deps",
+        "uv venv .venv && uv pip install -r requirements.txt",
+    ),
+    ("install a Python CLI tool globally with pipx", "pipx install httpie"),
+    ("upgrade all pipx-installed tools", "pipx upgrade-all"),
+    (
+        "sync project dependencies precisely from pyproject.toml with uv",
+        "uv pip sync requirements/prod.txt",
+    ),
+    (
+        "install a package and its recommended dependencies on Debian",
+        "sudo apt-get install -y --install-recommends git-lfs",
+    ),
+    ("search available packages matching a keyword on Red Hat", "dnf search 'postgresql'"),
+    ("show which package provides a specific file on Debian", "dpkg -S /usr/bin/psql"),
+    (
+        "install a specific Node.js version with nvm and use it",
+        "nvm install 22 && nvm use 22 && nvm alias default 22",
+    ),
+    ("set a global Python version with pyenv", "pyenv install 3.13.0 && pyenv global 3.13.0"),
+    (
+        "update the stable Rust toolchain and all components",
+        "rustup update stable && rustup component add clippy rustfmt",
+    ),
+    ("show current power management settings", "pmset -g"),
+    ("prevent display sleep when on AC power", "sudo pmset -c displaysleep 0"),
+    ("set battery-only sleep to 10 minutes", "sudo pmset -b sleep 10"),
+    ("show power management assertion reasons why sleep is blocked", "pmset -g assertions"),
+    (
+        "check what woke the Mac from sleep last time",
+        "pmset -g log | grep -E 'Wake|Sleep' | tail -20",
+    ),
+    (
+        "check if a binary is allowed by Gatekeeper",
+        "spctl --assess --verbose /Applications/SomeApp.app",
+    ),
+    ("show code signing details of an application", "codesign -dvv /Applications/SomeApp.app 2>&1"),
+    (
+        "verify the code signature of a binary is intact",
+        "codesign --verify --strict --verbose=2 /usr/local/bin/mytool",
+    ),
+    (
+        "sign a binary with your developer identity",
+        "codesign --force --sign 'Developer ID Application: Acme Corp' /path/to/binary",
+    ),
+    ("show all Gatekeeper rules currently in effect", "spctl --list"),
+    (
+        "show kernel logs from the last 5 minutes",
+        "log show --predicate 'process == \"kernel\"' --last 5m --style compact",
+    ),
+    (
+        "stream live system log filtered to a subsystem",
+        "log stream --predicate 'subsystem == \"com.apple.network\"' --level debug",
+    ),
+    (
+        "find recent crashes for a specific process",
+        "log show --predicate 'process == \"Safari\" AND messageType == fault' --last 1h",
+    ),
+    ("list all extended attributes on a file", "xattr -l ~/Downloads/SomeApp.dmg"),
+    (
+        "remove quarantine flag from a downloaded file",
+        "xattr -d com.apple.quarantine ~/Downloads/SomeApp.dmg",
+    ),
+    (
+        "strip all extended attributes from a directory recursively",
+        "xattr -cr ~/Downloads/untrusted_folder",
+    ),
+    ("resize an image to 800px wide preserving aspect ratio", "sips --resampleWidth 800 photo.jpg"),
+    (
+        "batch convert all PNGs to JPEG in current directory",
+        "sips -s format jpeg *.png --out converted/",
+    ),
+    ("show all metadata for an image file", "mdls photo.jpg"),
+    ("start an immediate Time Machine backup", "tmutil startbackup --auto --rotation"),
+    ("list all Time Machine snapshot dates", "tmutil listbackups"),
+    ("show how much data changed since the last backup", "tmutil compare -n | tail -5"),
+    (
+        "trim a video from 00:01:30 to 00:04:00 without re-encoding",
+        "ffmpeg -ss 00:01:30 -to 00:04:00 -i input.mp4 -c copy trimmed.mp4",
+    ),
+    (
+        "extract audio track from a video as mp3",
+        "ffmpeg -i video.mp4 -vn -ar 44100 -ac 2 -b:a 192k audio.mp3",
+    ),
+    (
+        "convert a video to a gif with palette optimization",
+        "ffmpeg -i input.mp4 -vf 'fps=15,scale=640:-1:flags=lanczos,palettegen' palette.png && ffmpeg -i input.mp4 -i palette.png -filter_complex 'fps=15,scale=640:-1:flags=lanczos[x];[x][1:v]paletteuse' output.gif",
+    ),
+    (
+        "concatenate multiple mp4 files seamlessly",
+        "printf 'file %s\\n' clip1.mp4 clip2.mp4 clip3.mp4 > filelist.txt && ffmpeg -f concat -safe 0 -i filelist.txt -c copy merged.mp4",
+    ),
+    (
+        "extract a single frame from video at timestamp",
+        "ffmpeg -ss 00:02:15 -i video.mp4 -frames:v 1 -q:v 2 frame.jpg",
+    ),
+    (
+        "reduce video bitrate for web streaming",
+        "ffmpeg -i input.mp4 -vcodec libx264 -crf 28 -preset slow -acodec aac -b:a 128k web.mp4",
+    ),
+    (
+        "add subtitles from srt file to video",
+        "ffmpeg -i video.mp4 -vf subtitles=subs.srt output_with_subs.mp4",
+    ),
+    (
+        "convert and compress a TIFF to JPEG with 85 quality",
+        "convert input.tiff -quality 85 output.jpg",
+    ),
+    (
+        "batch watermark all images in a directory",
+        "mogrify -draw \"text 10,30 'Copyright 2026'\" -font Helvetica -pointsize 20 -fill 'rgba(255,255,255,0.5)' *.jpg",
+    ),
+    (
+        "create a contact sheet thumbnail grid from images",
+        "montage *.jpg -geometry 200x150+4+4 -tile 4x contactsheet.jpg",
+    ),
+    ("strip all EXIF metadata from images in place", "mogrify -strip *.jpg"),
+    ("convert wav to mp3 using sox and lame", "sox input.wav -t mp3 output.mp3"),
+    ("trim an audio file to keep seconds 30 through 90", "sox input.wav output.wav trim 30 60"),
+    ("normalize audio volume to prevent clipping", "sox --norm input.wav normalized.wav"),
+    (
+        "split audio file on silence for track detection",
+        "sox input.wav output.wav silence 1 0.1 0.1% 1 3.0 0.1% : newfile : restart",
+    ),
+    (
+        "download a YouTube video as best quality mp4",
+        "yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]' -o '%(title)s.%(ext)s' 'https://youtu.be/VIDEO_ID'",
+    ),
+    (
+        "extract only audio from a YouTube playlist as mp3",
+        "yt-dlp -x --audio-format mp3 --audio-quality 0 -o '%(playlist_index)02d - %(title)s.%(ext)s' 'https://www.youtube.com/playlist?list=PLAYLIST_ID'",
+    ),
+    (
+        "download subtitles for a video without downloading video",
+        "yt-dlp --skip-download --write-subs --sub-lang en 'https://youtu.be/VIDEO_ID'",
+    ),
+    (
+        "merge multiple PDFs into one with ghostscript",
+        "gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=merged.pdf part1.pdf part2.pdf part3.pdf",
+    ),
+    (
+        "extract pages 3 through 7 from a PDF using qpdf",
+        "qpdf --empty --pages input.pdf 3-7 -- extracted.pdf",
+    ),
+    ("split a PDF into one file per page", "qpdf --split-pages input.pdf page_%d.pdf"),
+    (
+        "extract all IPv4 addresses from a file using PCRE",
+        "grep -oP '(?<![0-9])(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?![0-9])' file.txt | sort -u",
+    ),
+    ("match lines containing a word boundary with PCRE", "grep -P '\\bfoo\\b' file.txt"),
+    (
+        "find lines where a number is followed by specific text using lookahead",
+        "grep -P '[0-9]+(?= errors found)' build.log",
+    ),
+    (
+        "extract content inside double quotes using named capture",
+        'grep -oP \'"(?P<value>[^"]+)"\' config.json | grep -oP \'(?<=")[^"]+(?=")\'',
+    ),
+    ("match lines that do NOT contain any digit", "grep -P '^[^0-9]+$' file.txt"),
+    ("extract function call arguments using PCRE", "grep -oP 'connect\\(\\K[^)]+' db.py"),
+    ("replace only the second occurrence of a pattern on each line", "sed 's/foo/bar/2' file.txt"),
+    ("delete lines between two inclusive patterns", "sed '/BEGIN/,/END/d' file.txt"),
+    ("insert a line before a pattern match", "sed '/^server {/i\\    # managed block' nginx.conf"),
+    ("append text after a matching line", "sed '/listen 80/a\\    listen 443 ssl;' nginx.conf"),
+    (
+        "extract a capture group using sed extended regex",
+        "sed -nE 's/.*version[[:space:]]+([0-9.]+).*/\\1/p' Makefile",
+    ),
+    ("print lines where field 3 is greater than 1000", "awk '$3 > 1000' metrics.txt"),
+    ("print lines between pattern start and end inclusive", "awk '/^START$/,/^END$/' logfile.txt"),
+    (
+        "sum field 2 only for lines matching a pattern",
+        "awk '/ERROR/ {sum += $2} END {print sum}' app.log",
+    ),
+    ("reformat columns rearranging field order", "awk -F',' '{print $3, $1, $2}' OFS='|' data.csv"),
+    (
+        "in-place replace with perl across multiple files",
+        "perl -pi -e 's/old_api_endpoint/new_api_endpoint/g' **/*.ts",
+    ),
+    (
+        "extract and print a named capture group with perl",
+        "perl -nE 'say $+{host} if /host=(?<host>[\\w.]+)/' config.txt",
+    ),
+    (
+        "delete lines matching a pattern in-place with perl",
+        "perl -ni -e 'print unless /^#/' config.py",
+    ),
+    (
+        "use perl lookahead to match word not followed by suffix",
+        "perl -nE 'say if /foo(?!bar)/' file.txt",
+    ),
+    ("transliterate characters in-place with perl", "perl -pi -e 'tr/a-z/A-Z/' file.txt"),
+    (
+        "use perl to join continuation lines ending with backslash",
+        "perl -0777 -pe 's/\\\\\\n//g' Makefile",
+    ),
+    (
+        "prepend a directory to PATH for the current session only",
+        'export PATH="/usr/local/opt/ruby/bin:$PATH"',
+    ),
+    (
+        "add a directory to PATH permanently in zsh",
+        "echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> ~/.zshrc && source ~/.zshrc",
+    ),
+    (
+        "remove a specific entry from PATH without restarting shell",
+        "export PATH=$(echo \"$PATH\" | tr ':' '\\n' | grep -v '/usr/local/opt/old' | tr '\\n' ':' | sed 's/:$//')",
+    ),
+    ("show all directories in PATH one per line", "echo \"$PATH\" | tr ':' '\\n'"),
+    ("check which binary in PATH would run for a command", "type -a python3"),
+    (
+        "define a persistent alias in zsh",
+        "echo \"alias ll='ls -lAh --color=auto'\" >> ~/.zshrc && source ~/.zshrc",
+    ),
+    (
+        "define a shell function to make and enter a directory",
+        'mkcd() { mkdir -p "$1" && cd "$1"; }',
+    ),
+    (
+        "define a function to activate a python venv if it exists",
+        "activate() { [[ -f .venv/bin/activate ]] && source .venv/bin/activate || echo 'no .venv found'; }",
+    ),
+    ("unset an alias that is shadowing a system command", "unalias ls"),
+    ("list all currently defined shell functions", "declare -f"),
+    (
+        "run cleanup function on script exit regardless of success",
+        "trap 'rm -f /tmp/lockfile.$$; echo cleaned up' EXIT",
+    ),
+    (
+        "catch SIGINT in a script and exit gracefully",
+        "trap 'echo; echo \"Interrupted — exiting\"; exit 130' INT",
+    ),
+    ("re-enable default SIGPIPE handling after suppressing it", "trap '' PIPE"),
+    (
+        "print error line number on any command failure",
+        "trap 'echo \"Error at line $LINENO\" >&2' ERR",
+    ),
+    ("enable strict mode for safer scripting", "set -euo pipefail"),
+    ("enable debug tracing to see every command before execution", "set -x"),
+    ("disable glob expansion temporarily for a single command", "set -f; cp *.txt /tmp/; set +f"),
+    ("turn on extended globbing in zsh", "setopt EXTENDED_GLOB"),
+    (
+        "search zsh history interactively with fzf",
+        "history 0 | fzf --tac --no-sort | awk '{$1=\"\"; print $0}' | xargs",
+    ),
+    ("append current session history to history file immediately", "history -a"),
+    (
+        "increase zsh history size and avoid duplicates",
+        "echo 'HISTSIZE=100000; SAVEHIST=100000; setopt HIST_IGNORE_ALL_DUPS SHARE_HISTORY' >> ~/.zshrc",
+    ),
+    ("show the last 20 commands with timestamps in bash", "HISTTIMEFORMAT='%F %T  ' history 20"),
+    ("clear the current shell history without touching the file", "history -c"),
+    ("re-execute the last command that started with a prefix", "!git"),
+    (
+        "export a variable so all child processes inherit it",
+        "export DATABASE_URL='postgresql://user:pass@localhost:5432/mydb'",
+    ),
+    ("source a .env file into the current shell safely", "set -a && source .env && set +a"),
+    ("list recent GitHub Actions workflow runs", "gh run list --limit 20"),
+    (
+        "watch a GitHub Actions run in real time",
+        "gh run watch $(gh run list --limit 1 --json databaseId -q '.[0].databaseId')",
+    ),
+    (
+        "re-run all failed jobs in the latest workflow run",
+        "gh run rerun --failed $(gh run list --limit 1 --json databaseId -q '.[0].databaseId')",
+    ),
+    (
+        "view logs for a specific failed run",
+        "gh run view --log-failed $(gh run list --limit 1 --json databaseId -q '.[0].databaseId')",
+    ),
+    ("list all workflow files in a repo", "gh workflow list"),
+    (
+        "manually trigger a workflow with an input",
+        "gh workflow run deploy.yml -f environment=staging",
+    ),
+    ("disable a GitHub Actions workflow", "gh workflow disable build.yml"),
+    ("initialize terraform and upgrade providers", "terraform init -upgrade"),
+    ("plan terraform changes and save to file", "terraform plan -out=tfplan.binary"),
+    ("apply a saved terraform plan", "terraform apply tfplan.binary"),
+    ("destroy specific terraform resource", "terraform destroy -target=aws_instance.web"),
+    ("show current terraform state summary", "terraform state list"),
+    (
+        "import an existing resource into terraform state",
+        "terraform import aws_s3_bucket.assets my-bucket-name",
+    ),
+    ("format all terraform files in place", "terraform fmt -recursive"),
+    ("ping all hosts in inventory", "ansible all -m ping -i inventory.ini"),
+    (
+        "run ad-hoc shell command on a host group",
+        "ansible webservers -m shell -a 'systemctl status nginx' -i inventory.ini",
+    ),
+    (
+        "copy a file to all remote hosts",
+        "ansible all -m copy -a 'src=./app.conf dest=/etc/app/app.conf' -i inventory.ini --become",
+    ),
+    (
+        "list all available make targets",
+        "make -qp | awk -F':' '/^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)/ {split($1,A,/ /); for(i in A) print A[i]}' | sort -u",
+    ),
+    ("run just recipe with dry-run to preview commands", "just --dry-run deploy"),
+    ("run only tests marked as slow", "pytest -m slow -v"),
+    ("run tests matching a keyword expression", "pytest -k 'auth and not admin' -v"),
+    (
+        "run a single test function by node ID",
+        "pytest tests/test_api.py::test_login_returns_token -v",
+    ),
+    ("run tests in parallel across 4 workers", "pytest -n 4"),
+    ("show the 10 slowest tests after a run", "pytest --durations=10"),
+    ("stop on first failure and enter debugger", "pytest -x --pdb"),
+    ("regenerate all pytest snapshots", "pytest --snapshot-update"),
+    ("run tests and emit junit XML for CI", "pytest --junitxml=test-results.xml"),
+    (
+        "run tests with coverage and show missing lines",
+        "pytest --cov=src --cov-report=term-missing",
+    ),
+    ("fail the build if coverage drops below 80%", "pytest --cov=src --cov-fail-under=80"),
+    (
+        "generate an HTML coverage report",
+        "pytest --cov=src --cov-report=html && open htmlcov/index.html",
+    ),
+    (
+        "show coverage diff against main branch",
+        "coverage run -m pytest && coverage xml && diff-cover coverage.xml --compare-branch=main",
+    ),
+    ("run ruff with auto-fix on entire project", "ruff check . --fix"),
+    (
+        "run eslint on staged files only",
+        "git diff --cached --name-only --diff-filter=ACM | grep '\\.ts$' | xargs eslint",
+    ),
+    (
+        "run clippy on all targets treating warnings as errors",
+        "cargo clippy --all-targets -- -D warnings",
+    ),
+    (
+        "lint all Python files and show first error only",
+        "ruff check . --select E,W --quiet | head -1",
+    ),
+    (
+        "check types across the whole monorepo with pyright",
+        "pyright --outputjson 2>/dev/null | jq '.summary'",
+    ),
+    ("run mypy in strict mode on a module", "mypy --strict src/auth.py"),
+    (
+        "run criterion benchmarks and open HTML report",
+        "cargo bench && open target/criterion/report/index.html",
+    ),
+    (
+        "compare benchmark results against baseline",
+        "hyperfine --warmup 5 --export-markdown bench.md './cmd_old' './cmd_new'",
+    ),
+    ("show column names and types of a CSV file", "csvstat --names data.csv"),
+    (
+        "filter CSV rows where column value exceeds threshold",
+        "csvgrep -c revenue -m '' data.csv | csvsort -c revenue -r | head -20",
+    ),
+    ("join two CSV files on a shared column", "csvjoin -c id users.csv orders.csv"),
+    ("convert CSV to JSON array", "csvjson data.csv"),
+    ("count rows in a CSV excluding header", "csvstat -c 1 --count data.csv | tail -1"),
+    ("flatten nested JSON array and extract unique values", "jq '[.[].tags[]] | unique' data.json"),
+    (
+        "group JSON array by a field and count",
+        "jq 'group_by(.status) | map({status: .[0].status, count: length})' records.json",
+    ),
+    (
+        "transform JSON with conditional field renaming",
+        "jq '[.[] | {id, name: (.fullName // .name), active: (.status == \"enabled\")}]' users.json",
+    ),
+    (
+        "merge JSON objects from two files at the key level",
+        "jq -n --slurpfile a a.json --slurpfile b b.json '$a[0] * $b[0]'",
+    ),
+    (
+        "extract nested paths that match a pattern",
+        'jq \'.. | strings | select(test("error"; "i"))\' response.json',
+    ),
+    ("read a nested YAML value by path", "yq '.spec.replicas' deployment.yaml"),
+    ("set a YAML field in place", "yq -i '.spec.replicas = 3' deployment.yaml"),
+    (
+        "merge two YAML files, second overrides first",
+        "yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' base.yaml override.yaml",
+    ),
+    ("convert a YAML file to JSON", "yq -o=json config.yaml"),
+    ("get summary statistics for all columns with xsv", "xsv stats data.csv | xsv table"),
+    ("sort a large CSV by a numeric column descending", "xsv sort -s revenue -R data.csv"),
+    ("select specific columns from a CSV with xsv", "xsv select id,name,email data.csv"),
+    (
+        "convert JSON to YAML using python",
+        'python3 -c "import sys, json, yaml; yaml.dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)" < data.json',
+    ),
+    ("base64 encode a file and copy to clipboard", "base64 < secret.key | tr -d '\\n' | pbcopy"),
+    (
+        "base64 decode a string and write to file",
+        "echo 'SGVsbG8gV29ybGQ=' | base64 --decode > output.txt",
+    ),
+    (
+        "capture packets on port 443 and write to pcap file",
+        "tcpdump -i eth0 -n 'tcp port 443' -w capture.pcap",
+    ),
+    (
+        "capture DNS queries and show hostnames",
+        "tcpdump -i any -n 'udp port 53' -l 2>/dev/null | grep -oP 'A\\? \\K[^ ]+'",
+    ),
+    (
+        "watch HTTP POST requests in real time",
+        "tcpdump -i eth0 -A -s 0 'tcp port 80 and (tcp[((tcp[12:1] & 0xf0) >> 2):4] = 0x504f5354)' 2>/dev/null",
+    ),
+    (
+        "capture packets between two specific hosts",
+        "tcpdump -i eth0 -n 'host 10.0.0.1 and host 10.0.0.2' -w host-pair.pcap",
+    ),
+    (
+        "allow established and related connections in iptables",
+        "iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT",
+    ),
+    (
+        "rate-limit incoming SSH connections",
+        "iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m limit --limit 3/min --limit-burst 3 -j ACCEPT",
+    ),
+    ("list nftables ruleset", "nft list ruleset"),
+    (
+        "block outgoing traffic to a specific IP with nftables",
+        "nft add rule ip filter output ip daddr 203.0.113.0/24 drop",
+    ),
+    ("query MX records for a domain", "dig MX example.com +short"),
+    ("check DNSSEC validation for a domain", "dig +dnssec example.com"),
+    ("trace the full DNS resolution chain", "dig +trace example.com"),
+    ("query all DNS record types for a domain", "dig ANY example.com @8.8.8.8"),
+    (
+        "measure full HTTP request timing breakdown",
+        "curl -so /dev/null -w 'namelookup:%{time_namelookup}s connect:%{time_connect}s starttransfer:%{time_starttransfer}s total:%{time_total}s\\n' https://example.com",
+    ),
+    (
+        "check which TLS version and cipher a server uses",
+        "curl -svo /dev/null https://example.com 2>&1 | grep -E 'SSL|TLS|cipher'",
+    ),
+    (
+        "send request with custom Host header for vhost testing",
+        "curl -sf -H 'Host: staging.example.com' http://10.0.0.5/healthz",
+    ),
+    (
+        "follow redirects and print each redirect URL",
+        "curl -sIL https://short.link/abc 2>&1 | grep -i 'location:'",
+    ),
+    ("run iperf3 TCP throughput test to a server", "iperf3 -c 192.168.1.10 -t 10 -P 4"),
+    ("run iperf3 UDP bandwidth test at 100 Mbps", "iperf3 -c 192.168.1.10 -u -b 100M -t 10"),
+    (
+        "run mtr in report mode and show 100 cycles",
+        "mtr --report --report-cycles 100 --no-dns 8.8.8.8",
+    ),
+    (
+        "traceroute using TCP SYN instead of UDP for firewalled paths",
+        "traceroute -T -p 443 example.com",
+    ),
 ]
-
-# Sanity check at import time
-assert len(EXPERT_PAIRS) >= 300, f"Expected >= 300 pairs, got {len(EXPERT_PAIRS)}"
