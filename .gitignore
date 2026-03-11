@@ -43,6 +43,9 @@ wandb/
 .env
 .env.local
 
+# Linter cache
+.ruff_cache/
+
 # Claude Code / agent state
 .claude/
 .agents/
