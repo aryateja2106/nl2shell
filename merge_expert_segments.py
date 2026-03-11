@@ -105,9 +105,9 @@ def main() -> None:
     ]
 
     for nl, cmd in unique_pairs:
-        # Escape any quotes in the strings
-        nl_escaped = nl.replace("\\", "\\\\").replace('"', '\\"')
-        cmd_escaped = cmd.replace("\\", "\\\\").replace('"', '\\"')
+        # Escape backslashes, quotes, and newlines so the output is valid single-line Python
+        nl_escaped = nl.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+        cmd_escaped = cmd.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
         lines.append(f'    ("{nl_escaped}", "{cmd_escaped}"),')
 
     lines.append("]")

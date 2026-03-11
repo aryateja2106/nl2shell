@@ -18,7 +18,6 @@ PAIRS: list[tuple[str, str]] = [
     # ADVANCED MACOS — pmset, spctl, codesign, profiles, log show, xattr,
     # sips, mdls, tmutil  (20 pairs)
     # =========================================================================
-
     # pmset — power management
     (
         "show current power management settings",
@@ -40,7 +39,6 @@ PAIRS: list[tuple[str, str]] = [
         "check what woke the Mac from sleep last time",
         "pmset -g log | grep -E 'Wake|Sleep' | tail -20",
     ),
-
     # spctl / codesign — security and code signing
     (
         "check if a binary is allowed by Gatekeeper",
@@ -62,7 +60,6 @@ PAIRS: list[tuple[str, str]] = [
         "show all Gatekeeper rules currently in effect",
         "spctl --list",
     ),
-
     # log show — unified logging
     (
         "show kernel logs from the last 5 minutes",
@@ -76,7 +73,6 @@ PAIRS: list[tuple[str, str]] = [
         "find recent crashes for a specific process",
         "log show --predicate 'process == \"Safari\" AND messageType == fault' --last 1h",
     ),
-
     # xattr — extended attributes
     (
         "list all extended attributes on a file",
@@ -90,7 +86,6 @@ PAIRS: list[tuple[str, str]] = [
         "strip all extended attributes from a directory recursively",
         "xattr -cr ~/Downloads/untrusted_folder",
     ),
-
     # sips / mdls — image metadata
     (
         "resize an image to 800px wide preserving aspect ratio",
@@ -104,7 +99,6 @@ PAIRS: list[tuple[str, str]] = [
         "show all metadata for an image file",
         "mdls photo.jpg",
     ),
-
     # tmutil — Time Machine
     (
         "start an immediate Time Machine backup",
@@ -118,11 +112,9 @@ PAIRS: list[tuple[str, str]] = [
         "show how much data changed since the last backup",
         "tmutil compare -n | tail -5",
     ),
-
     # =========================================================================
     # MEDIA PROCESSING — ffmpeg, ImageMagick, sox, yt-dlp, PDF tools (20 pairs)
     # =========================================================================
-
     # ffmpeg
     (
         "trim a video from 00:01:30 to 00:04:00 without re-encoding",
@@ -152,7 +144,6 @@ PAIRS: list[tuple[str, str]] = [
         "add subtitles from srt file to video",
         "ffmpeg -i video.mp4 -vf subtitles=subs.srt output_with_subs.mp4",
     ),
-
     # ImageMagick
     (
         "convert and compress a TIFF to JPEG with 85 quality",
@@ -170,7 +161,6 @@ PAIRS: list[tuple[str, str]] = [
         "strip all EXIF metadata from images in place",
         "mogrify -strip *.jpg",
     ),
-
     # sox — audio processing
     (
         "convert wav to mp3 using sox and lame",
@@ -188,7 +178,6 @@ PAIRS: list[tuple[str, str]] = [
         "split audio file on silence for track detection",
         "sox input.wav output.wav silence 1 0.1 0.1% 1 3.0 0.1% : newfile : restart",
     ),
-
     # yt-dlp
     (
         "download a YouTube video as best quality mp4",
@@ -202,7 +191,6 @@ PAIRS: list[tuple[str, str]] = [
         "download subtitles for a video without downloading video",
         "yt-dlp --skip-download --write-subs --sub-lang en 'https://youtu.be/VIDEO_ID'",
     ),
-
     # PDF tools
     (
         "merge multiple PDFs into one with ghostscript",
@@ -216,11 +204,9 @@ PAIRS: list[tuple[str, str]] = [
         "split a PDF into one file per page",
         "qpdf --split-pages input.pdf page_%d.pdf",
     ),
-
     # =========================================================================
     # REGEX & PATTERN MATCHING — grep -P, sed, awk, perl, named captures (20 pairs)
     # =========================================================================
-
     # grep -P (PCRE)
     (
         "extract all IPv4 addresses from a file using PCRE",
@@ -236,7 +222,7 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "extract content inside double quotes using named capture",
-        "grep -oP '\"(?P<value>[^\"]+)\"' config.json | grep -oP '(?<=\")[^\"]+(?=\")'",
+        'grep -oP \'"(?P<value>[^"]+)"\' config.json | grep -oP \'(?<=")[^"]+(?=")\'',
     ),
     (
         "match lines that do NOT contain any digit",
@@ -246,7 +232,6 @@ PAIRS: list[tuple[str, str]] = [
         "extract function call arguments using PCRE",
         "grep -oP 'connect\\(\\K[^)]+' db.py",
     ),
-
     # sed with complex regex
     (
         "replace only the second occurrence of a pattern on each line",
@@ -268,7 +253,6 @@ PAIRS: list[tuple[str, str]] = [
         "extract a capture group using sed extended regex",
         "sed -nE 's/.*version[[:space:]]+([0-9.]+).*/\\1/p' Makefile",
     ),
-
     # awk pattern matching
     (
         "print lines where field 3 is greater than 1000",
@@ -286,7 +270,6 @@ PAIRS: list[tuple[str, str]] = [
         "reformat columns rearranging field order",
         "awk -F',' '{print $3, $1, $2}' OFS='|' data.csv",
     ),
-
     # perl one-liners
     (
         "in-place replace with perl across multiple files",
@@ -310,18 +293,16 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "use perl to join continuation lines ending with backslash",
-        "perl -0777 -pe 's/\\\\\n//g' Makefile",
+        "perl -0777 -pe 's/\\\\\\n//g' Makefile",
     ),
-
     # =========================================================================
     # ENVIRONMENT & SHELL CONFIG — .bashrc/.zshrc, PATH, alias, trap,
     # shell options, history  (20 pairs)
     # =========================================================================
-
     # PATH manipulation
     (
         "prepend a directory to PATH for the current session only",
-        "export PATH=\"/usr/local/opt/ruby/bin:$PATH\"",
+        'export PATH="/usr/local/opt/ruby/bin:$PATH"',
     ),
     (
         "add a directory to PATH permanently in zsh",
@@ -339,7 +320,6 @@ PAIRS: list[tuple[str, str]] = [
         "check which binary in PATH would run for a command",
         "type -a python3",
     ),
-
     # alias / function definitions
     (
         "define a persistent alias in zsh",
@@ -347,7 +327,7 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "define a shell function to make and enter a directory",
-        "mkcd() { mkdir -p \"$1\" && cd \"$1\"; }",
+        'mkcd() { mkdir -p "$1" && cd "$1"; }',
     ),
     (
         "define a function to activate a python venv if it exists",
@@ -361,7 +341,6 @@ PAIRS: list[tuple[str, str]] = [
         "list all currently defined shell functions",
         "declare -f",
     ),
-
     # trap handlers
     (
         "run cleanup function on script exit regardless of success",
@@ -379,7 +358,6 @@ PAIRS: list[tuple[str, str]] = [
         "print error line number on any command failure",
         "trap 'echo \"Error at line $LINENO\" >&2' ERR",
     ),
-
     # Shell option settings
     (
         "enable strict mode for safer scripting",
@@ -397,7 +375,6 @@ PAIRS: list[tuple[str, str]] = [
         "turn on extended globbing in zsh",
         "setopt EXTENDED_GLOB",
     ),
-
     # History management
     (
         "search zsh history interactively with fzf",

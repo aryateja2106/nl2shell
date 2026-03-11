@@ -16,7 +16,6 @@ PAIRS: list[tuple[str, str]] = [
     # =========================================================================
     # SECURITY & CRYPTO (20 pairs)
     # =========================================================================
-
     # openssl certificate operations
     (
         "generate a 4096-bit RSA private key",
@@ -38,7 +37,6 @@ PAIRS: list[tuple[str, str]] = [
         "convert a PEM certificate to DER format",
         "openssl x509 -in cert.pem -outform DER -out cert.der",
     ),
-
     # GPG encrypt / decrypt / sign
     (
         "encrypt a file for a specific recipient with GPG",
@@ -60,7 +58,6 @@ PAIRS: list[tuple[str, str]] = [
         "list all keys in your GPG keyring",
         "gpg --list-keys --keyid-format LONG",
     ),
-
     # SSH key management (agent, forwarding)
     (
         "generate an ed25519 SSH key with a comment",
@@ -82,7 +79,6 @@ PAIRS: list[tuple[str, str]] = [
         "connect to a host with agent forwarding enabled",
         "ssh -A user@bastion.example.com",
     ),
-
     # File integrity (shasum, md5)
     (
         "compute SHA-256 checksum of a file",
@@ -96,7 +92,6 @@ PAIRS: list[tuple[str, str]] = [
         "generate MD5 checksums for all files in a directory",
         "find . -type f -print0 | xargs -0 md5 -r 2>/dev/null | sort > checksums.md5",
     ),
-
     # chmod / chown patterns for security
     (
         "lock down SSH private key permissions",
@@ -106,11 +101,9 @@ PAIRS: list[tuple[str, str]] = [
         "recursively set correct web-root ownership and permissions",
         "find /var/www/html -type d -exec chmod 755 {} + && find /var/www/html -type f -exec chmod 644 {} +",
     ),
-
     # =========================================================================
     # PERFORMANCE DEBUGGING (20 pairs)
     # =========================================================================
-
     # strace / dtrace / dtruss
     (
         "trace all file-open syscalls made by a running process",
@@ -128,7 +121,6 @@ PAIRS: list[tuple[str, str]] = [
         "trace file opens on macOS using dtruss",
         "sudo dtruss -f -t open_nocancel -p $(pgrep -n node) 2>&1 | head -50",
     ),
-
     # perf / flamegraph
     (
         "record a CPU perf profile for 10 seconds",
@@ -142,7 +134,6 @@ PAIRS: list[tuple[str, str]] = [
         "show top CPU-consuming functions in perf report",
         "sudo perf report --stdio --sort=dso,symbol | head -40",
     ),
-
     # time and benchmark
     (
         "run a command three times and show real elapsed time each run",
@@ -156,7 +147,6 @@ PAIRS: list[tuple[str, str]] = [
         "benchmark two implementations and compare",
         "hyperfine --warmup 5 './impl_a input.dat' './impl_b input.dat' --export-markdown results.md",
     ),
-
     # memory profiling (valgrind, leaks on macOS)
     (
         "run a program under valgrind memcheck and show leak summary",
@@ -174,7 +164,6 @@ PAIRS: list[tuple[str, str]] = [
         "run heap profiling with gperftools on Linux",
         "HEAPPROFILE=/tmp/heap.prof LD_PRELOAD=/usr/lib/libprofiler.so ./app",
     ),
-
     # I/O monitoring (iotop, iostat)
     (
         "show live disk I/O by process updated every second",
@@ -196,11 +185,9 @@ PAIRS: list[tuple[str, str]] = [
         "measure latency of disk operations with fio quick test",
         "fio --name=randread --ioengine=libaio --iodepth=16 --rw=randread --bs=4k --size=256M --runtime=10 --filename=/tmp/fio_test",
     ),
-
     # =========================================================================
     # CRON & AUTOMATION (20 pairs)
     # =========================================================================
-
     # crontab edit / list / remove
     (
         "open crontab for editing",
@@ -226,7 +213,6 @@ PAIRS: list[tuple[str, str]] = [
         "run a job every 15 minutes and log output",
         "(crontab -l 2>/dev/null; echo '*/15 * * * * /opt/scripts/check.sh >> /var/log/check.log 2>&1') | crontab -",
     ),
-
     # systemd service management
     (
         "enable a systemd service to start on boot",
@@ -242,9 +228,8 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "create a minimal systemd unit file for a web service",
-        "sudo tee /etc/systemd/system/myapp.service > /dev/null <<'EOF'\n[Unit]\nDescription=My Application\nAfter=network.target\n\n[Service]\nUser=appuser\nWorkingDirectory=/opt/myapp\nExecStart=/opt/myapp/bin/server\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\nEOF",
+        "printf '[Unit]\\nDescription=My Application\\nAfter=network.target\\n\\n[Service]\\nUser=appuser\\nWorkingDirectory=/opt/myapp\\nExecStart=/opt/myapp/bin/server\\nRestart=always\\nRestartSec=5\\n\\n[Install]\\nWantedBy=multi-user.target\\n' | sudo tee /etc/systemd/system/myapp.service > /dev/null",
     ),
-
     # launchctl on macOS
     (
         "load and start a launchd plist agent immediately",
@@ -260,9 +245,8 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "run a command every 5 minutes via a launchd plist",
-        "cat > ~/Library/LaunchAgents/com.example.heartbeat.plist <<'EOF'\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\"><dict>\n  <key>Label</key><string>com.example.heartbeat</string>\n  <key>ProgramArguments</key><array><string>/opt/scripts/heartbeat.sh</string></array>\n  <key>StartInterval</key><integer>300</integer>\n  <key>RunAtLoad</key><true/>\n</dict></plist>\nEOF\nlaunchctl load -w ~/Library/LaunchAgents/com.example.heartbeat.plist",
+        'printf \'<?xml version="1.0" encoding="UTF-8"?>\\n<plist version="1.0"><dict>\\n<key>Label</key><string>com.example.heartbeat</string>\\n<key>ProgramArguments</key><array><string>/opt/scripts/heartbeat.sh</string></array>\\n<key>StartInterval</key><integer>300</integer>\\n<key>RunAtLoad</key><true/>\\n</dict></plist>\' > ~/Library/LaunchAgents/com.example.heartbeat.plist && launchctl load -w ~/Library/LaunchAgents/com.example.heartbeat.plist',
     ),
-
     # at / batch scheduling
     (
         "schedule a one-time job to run in 10 minutes",
@@ -276,7 +260,6 @@ PAIRS: list[tuple[str, str]] = [
         "remove a pending at job by job number",
         "atrm 3",
     ),
-
     # watchdog / supervisor patterns
     (
         "start a supervisor-managed process and check its status",
@@ -290,11 +273,9 @@ PAIRS: list[tuple[str, str]] = [
         "reload supervisor config and restart all programs",
         "supervisorctl reread && supervisorctl update && supervisorctl restart all",
     ),
-
     # =========================================================================
     # PACKAGE MANAGEMENT (20 pairs)
     # =========================================================================
-
     # brew advanced
     (
         "add a third-party Homebrew tap",
@@ -320,7 +301,6 @@ PAIRS: list[tuple[str, str]] = [
         "upgrade all outdated Homebrew packages",
         "brew update && brew upgrade",
     ),
-
     # npm / yarn / pnpm
     (
         "install dependencies without modifying the lockfile",
@@ -342,7 +322,6 @@ PAIRS: list[tuple[str, str]] = [
         "list top-level npm packages only",
         "npm ls --depth=0",
     ),
-
     # pip / uv / pipx
     (
         "create an isolated virtual environment with uv and install deps",
@@ -360,7 +339,6 @@ PAIRS: list[tuple[str, str]] = [
         "sync project dependencies precisely from pyproject.toml with uv",
         "uv pip sync requirements/prod.txt",
     ),
-
     # apt / dnf
     (
         "install a package and its recommended dependencies on Debian",
@@ -374,7 +352,6 @@ PAIRS: list[tuple[str, str]] = [
         "show which package provides a specific file on Debian",
         "dpkg -S /usr/bin/psql",
     ),
-
     # version management (nvm, pyenv, rustup)
     (
         "install a specific Node.js version with nvm and use it",

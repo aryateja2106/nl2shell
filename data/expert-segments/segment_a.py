@@ -14,7 +14,6 @@ PAIRS: list[tuple[str, str]] = [
     # =========================================================================
     # ADVANCED STDERR / STDOUT (20 pairs)
     # =========================================================================
-
     # Stream swapping — 3>&1 1>&2 2>&3 idiom
     (
         "redirect only the stderr of a script through a grep filter while keeping stdout intact",
@@ -24,11 +23,10 @@ PAIRS: list[tuple[str, str]] = [
         "swap stderr and stdout streams using a temporary file descriptor 3",
         "exec 3>&1; ./script.sh 2>&1 1>&3 3>&- | sed 's/^/ERR: /' >&2; exec 3>&-",
     ),
-
     # PIPESTATUS — capturing exit codes through a pipeline
     (
         "check exit code of first command in a pipe",
-        "gzip < big.log | wc -c; echo \"gzip exit: ${PIPESTATUS[0]}\"",
+        'gzip < big.log | wc -c; echo "gzip exit: ${PIPESTATUS[0]}"',
     ),
     (
         "fail if any command in a pipeline fails",
@@ -36,13 +34,12 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "capture all pipeline exit codes after running",
-        "cmd1 | cmd2 | cmd3; echo \"exits: ${PIPESTATUS[*]}\"",
+        'cmd1 | cmd2 | cmd3; echo "exits: ${PIPESTATUS[*]}"',
     ),
     (
         "assert pipeline succeeded and print status array",
         "pg_dump mydb | gzip > mydb.sql.gz; [[ ${PIPESTATUS[0]} -eq 0 ]] || echo 'pg_dump failed'",
     ),
-
     # tee to multiple outputs simultaneously
     (
         "tee command output to two different files at once",
@@ -60,7 +57,6 @@ PAIRS: list[tuple[str, str]] = [
         "tee stderr to a file while stdout continues to terminal",
         "{ ./run.sh 2>&1 1>&3 | tee errors.log 1>&2; } 3>&1",
     ),
-
     # Process substitution with error handling
     (
         "diff two command outputs and fail if they differ",
@@ -68,13 +64,12 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "feed process substitution output into while loop",
-        "while IFS= read -r line; do echo \"got: $line\"; done < <(kubectl get pods 2>/dev/null)",
+        'while IFS= read -r line; do echo "got: $line"; done < <(kubectl get pods 2>/dev/null)',
     ),
     (
         "capture stderr of process substitution separately",
         "diff <(cmd1 2>cmd1_err.log) <(cmd2 2>cmd2_err.log)",
     ),
-
     # Named pipes / advanced redirect patterns
     (
         "write stdout to one file and stderr to another without shell builtins",
@@ -104,11 +99,9 @@ PAIRS: list[tuple[str, str]] = [
         "redirect stdout to stderr for a single echo",
         "echo 'this goes to stderr' >&2",
     ),
-
     # =========================================================================
     # ADVANCED GIT (20 pairs)
     # =========================================================================
-
     # git worktree
     (
         "create a worktree for a hotfix branch without switching",
@@ -122,7 +115,6 @@ PAIRS: list[tuple[str, str]] = [
         "remove a worktree and prune stale references",
         "git worktree remove ../hotfix-tree && git worktree prune",
     ),
-
     # git reflog
     (
         "find the commit hash before an accidental reset",
@@ -136,7 +128,6 @@ PAIRS: list[tuple[str, str]] = [
         "restore branch to state 3 moves ago via reflog",
         "git reset --hard HEAD@{3}",
     ),
-
     # git stash push -p (interactive partial stash)
     (
         "interactively stash only selected hunks",
@@ -146,7 +137,6 @@ PAIRS: list[tuple[str, str]] = [
         "stash only a specific file",
         "git stash push -m 'wip: config only' -- config/settings.py",
     ),
-
     # Searching commit history with regex
     (
         "search commit messages for a pattern across all branches",
@@ -160,7 +150,6 @@ PAIRS: list[tuple[str, str]] = [
         "search commit diffs for a regex pattern",
         "git log -G 'password\\s*=' --oneline --all",
     ),
-
     # git blame with line range
     (
         "blame a specific line range in a file",
@@ -170,7 +159,6 @@ PAIRS: list[tuple[str, str]] = [
         "blame ignoring whitespace-only changes",
         "git blame -w -L 10,30 src/api/routes.py",
     ),
-
     # Show specific commit files / contents
     (
         "show the content of a file at a specific commit",
@@ -180,7 +168,6 @@ PAIRS: list[tuple[str, str]] = [
         "list all files that were changed in a specific commit",
         "git diff-tree --no-commit-id -r --name-only abc1234",
     ),
-
     # Submodule operations
     (
         "clone a repo and initialize all submodules recursively",
@@ -194,7 +181,6 @@ PAIRS: list[tuple[str, str]] = [
         "show which submodule commit is checked out",
         "git submodule status --recursive",
     ),
-
     # Sparse checkout
     (
         "enable sparse checkout and fetch only a specific directory",
@@ -204,11 +190,9 @@ PAIRS: list[tuple[str, str]] = [
         "add another directory to an existing sparse checkout",
         "git sparse-checkout add docs/architecture",
     ),
-
     # =========================================================================
     # KUBERNETES / CLOUD (20 pairs)
     # =========================================================================
-
     # kubectl — get/describe/logs
     (
         "get all pods across all namespaces with node assignment",
@@ -250,7 +234,6 @@ PAIRS: list[tuple[str, str]] = [
         "apply a manifest and wait for rollout to complete",
         "kubectl apply -f k8s/deployment.yaml && kubectl rollout status deployment/api-server -n production",
     ),
-
     # AWS CLI
     (
         "list all running EC2 instances with their IPs",
@@ -266,13 +249,12 @@ PAIRS: list[tuple[str, str]] = [
     ),
     (
         "invoke a Lambda function and show the response",
-        "aws lambda invoke --function-name my-function --payload '{\"key\":\"value\"}' /tmp/out.json && cat /tmp/out.json",
+        'aws lambda invoke --function-name my-function --payload \'{"key":"value"}\' /tmp/out.json && cat /tmp/out.json',
     ),
     (
         "get a secret value from Secrets Manager",
         "aws secretsmanager get-secret-value --secret-id prod/db/password --query SecretString --output text",
     ),
-
     # GCP gcloud
     (
         "list all Cloud Run services across all regions",
@@ -294,11 +276,9 @@ PAIRS: list[tuple[str, str]] = [
         "set a Cloud Run environment variable without redeploying image",
         "gcloud run services update my-service --set-env-vars DB_URL=postgres://host/db --region us-central1",
     ),
-
     # =========================================================================
     # DATABASE CLI (20 pairs)
     # =========================================================================
-
     # psql one-liners
     (
         "run a SQL query from the command line without interactive prompt",
@@ -324,7 +304,6 @@ PAIRS: list[tuple[str, str]] = [
         "kill a long-running PostgreSQL query by pid",
         "psql -U myuser -d mydb -c 'SELECT pg_terminate_backend(12345);'",
     ),
-
     # sqlite3
     (
         "query a SQLite database file from the command line",
@@ -346,7 +325,6 @@ PAIRS: list[tuple[str, str]] = [
         "run a vacuum on a SQLite database to reclaim space",
         "sqlite3 app.db 'VACUUM;'",
     ),
-
     # mysql
     (
         "run a MySQL query from the command line",
@@ -360,7 +338,6 @@ PAIRS: list[tuple[str, str]] = [
         "import a SQL dump into MySQL",
         "mysql -u root -p'$DB_PASS' mydb < backup.sql",
     ),
-
     # redis-cli
     (
         "get all keys matching a pattern in Redis",
@@ -378,7 +355,6 @@ PAIRS: list[tuple[str, str]] = [
         "check Redis memory usage and eviction stats",
         "redis-cli INFO memory | grep -E 'used_memory_human|maxmemory_human|evicted_keys'",
     ),
-
     # mongosh
     (
         "count documents in a MongoDB collection from the shell",
