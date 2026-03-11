@@ -1,0 +1,30 @@
+# NL2Shell Ollama Modelfile
+#
+# NOTE: Qwen3.5's hybrid DeltaNet architecture is not yet supported by Ollama's
+# GGUF loader. Once Ollama adds qwen35 architecture support, this Modelfile will
+# work with the GGUF files on HuggingFace:
+#
+#   ollama create nl2shell -f Modelfile
+#
+# Until then, Vox CLI defaults to qwen2.5-coder:0.5b as a fallback.
+# The fine-tuned model can still be used via Python transformers:
+#
+#   from transformers import AutoModelForCausalLM, AutoTokenizer
+#   model = AutoModelForCausalLM.from_pretrained("AryaYT/nl2shell-0.8b")
+#
+# For v3 training, consider Qwen2.5-Coder-1.5B as an Ollama-compatible base.
+
+FROM gguf/Qwen3.5-0.8B.Q4_K_M.gguf
+
+SYSTEM "You are an expert shell programmer. Given a natural language request, output ONLY the corresponding shell command. No explanations, no markdown, no code fences, no comments. Just the raw command."
+
+PARAMETER temperature 0.1
+PARAMETER num_predict 256
+PARAMETER stop "<|im_end|>"
+
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""
