@@ -42,12 +42,13 @@ def load_pairs_from_file(filepath: Path) -> list[tuple[str, str]]:
 
 
 def deduplicate_pairs(pairs: list[tuple[str, str]]) -> list[tuple[str, str]]:
-    """Deduplicate by shell command (keep first occurrence)."""
-    seen_cmds: set[str] = set()
+    """Deduplicate by (NL, command) pair — keeps different NL phrasings for the same command."""
+    seen: set[tuple[str, str]] = set()
     unique: list[tuple[str, str]] = []
     for nl, cmd in pairs:
-        if cmd not in seen_cmds:
-            seen_cmds.add(cmd)
+        key = (nl.strip().lower(), cmd.strip())
+        if key not in seen:
+            seen.add(key)
             unique.append((nl, cmd))
     return unique
 
@@ -76,17 +77,13 @@ def main() -> None:
         print(f"  {agent_name}: {len(pairs)} pairs")
         all_pairs.extend(pairs)
 
-    # Also load existing expert_pairs.py if it exists (from engineer agent)
-    if output_file.exists():
-        existing = load_pairs_from_file(output_file)
-        if existing:
-            print(f"  existing expert_pairs.py: {len(existing)} pairs")
-            all_pairs.extend(existing)
+    # NOTE: We do NOT re-load expert_pairs.py here — it's the OUTPUT file.
+    # Segments are the source of truth. Re-loading would just add duplicates.
 
     print(f"\nTotal raw pairs: {len(all_pairs)}")
 
     unique_pairs = deduplicate_pairs(all_pairs)
-    print(f"After dedup by command: {len(unique_pairs)}")
+    print(f"After dedup by (NL, cmd) pair: {len(unique_pairs)}")
 
     # Write the merged file
     lines = [
