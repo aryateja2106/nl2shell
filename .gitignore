@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# uv
+uv.lock
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML artifacts (don't commit model weights)
+*.bin
+*.safetensors
+*.gguf
+*.pt
+*.pth
+checkpoints/
+outputs/
+wandb/
+
+# Environment
+.env
+.env.local
+
+# Claude Code / agent state
+.claude/
+.agents/
