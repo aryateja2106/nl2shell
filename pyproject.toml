@@ -37,10 +37,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/aryateja2106/nl2shell"
-Documentation = "https://github.com/aryateja2106/nl2shell#readme"
-Repository = "https://github.com/aryateja2106/nl2shell"
-"Bug Tracker" = "https://github.com/aryateja2106/nl2shell/issues"
+Homepage = "https://github.com/nl2shell/nl2shell"
+Documentation = "https://github.com/nl2shell/nl2shell#readme"
+Repository = "https://github.com/nl2shell/nl2shell"
+"Bug Tracker" = "https://github.com/nl2shell/nl2shell/issues"
 "Model" = "https://huggingface.co/AryaYT/nl2shell-0.8b"
 "Dataset" = "https://huggingface.co/datasets/AryaYT/nl2shell-training"
 "Demo" = "https://huggingface.co/spaces/AryaYT/nl2shell-demo"

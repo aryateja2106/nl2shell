@@ -49,3 +49,5 @@ wandb/
 # Claude Code / agent state
 .claude/
 .agents/
+logs/
+results.tsv
