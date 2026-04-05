@@ -110,7 +110,7 @@ This project uses [uv](https://docs.astral.sh/uv/) for Python package management
 
 ```bash
 # Clone the repo
-git clone https://github.com/aryateja2106/nl2shell
+git clone https://github.com/nl2shell/nl2shell
 cd nl2shell
 
 # Install uv (if you don't have it)
@@ -465,7 +465,7 @@ Contributions are welcome. Areas where help is most valuable:
 To contribute:
 
 ```bash
-git clone https://github.com/aryateja2106/nl2shell
+git clone https://github.com/nl2shell/nl2shell
 cd nl2shell
 uv sync --group dev
 git checkout -b feat/your-feature
@@ -490,7 +490,7 @@ If you use NL2Shell in your research, please cite:
                   with Hybrid DeltaNet Architecture},
   author       = {Arya Teja},
   year         = {2026},
-  howpublished = {\url{https://github.com/aryateja2106/nl2shell}},
+  howpublished = {\url{https://github.com/nl2shell/nl2shell}},
   note         = {Fine-tuned Qwen3.5-0.8B (QLoRA) on NL2Bash + macOS synthetic pairs.
                   Model: \url{https://huggingface.co/AryaYT/nl2shell-0.8b}},
 }
@@ -505,9 +505,9 @@ If you use NL2Shell in your research, please cite:
 | Model (HuggingFace) | https://huggingface.co/AryaYT/nl2shell-0.8b |
 | Dataset (HuggingFace) | https://huggingface.co/datasets/AryaYT/nl2shell-training |
 | Demo (Gradio Space) | https://huggingface.co/spaces/AryaYT/nl2shell-demo |
-| GitHub | https://github.com/aryateja2106/nl2shell |
+| GitHub | https://github.com/nl2shell/nl2shell |
 | CloudAGI | https://cloudagi.ai |
-| Author | https://github.com/aryateja2106 |
+| Author | https://github.com/nl2shell |
 | Base model | https://huggingface.co/Qwen/Qwen3.5-0.8B |
 | NL2Bash dataset | https://huggingface.co/datasets/GWHed/nl2bash |
 
@@ -517,4 +517,4 @@ If you use NL2Shell in your research, please cite:
 
 MIT License. See [LICENSE](LICENSE).
 
-Built by [Arya Teja](https://github.com/aryateja2106) as part of [CloudAGI](https://cloudagi.ai) — Agent Credit Economy.
+Built by [Arya Teja](https://github.com/nl2shell) as part of [CloudAGI](https://cloudagi.ai) — Agent Credit Economy.

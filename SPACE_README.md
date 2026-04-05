@@ -156,6 +156,6 @@ commands involving `rm`, `kill`, `sudo`, or network operations. This is a resear
 ## Source
 
 - Model: [AryaYT/nl2shell-0.8b](https://huggingface.co/AryaYT/nl2shell-0.8b)
-- Training repo: [aryateja2106/cloudagi](https://github.com/aryateja2106/cloudagi)
+- Training repo: [nl2shell/nl2shell](https://github.com/nl2shell/nl2shell)
 - Project: [CloudAGI](https://cloudagi.ai) — Agent Credit Economy
-- Author: [Arya Teja](https://github.com/aryateja2106)
+- Author: [Arya Teja](https://github.com/nl2shell)

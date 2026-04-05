@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-US"
+tone_instructions: "Be direct and technical. Focus on ML training correctness, data quality, and reproducibility."
+early_access: false
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  auto_title_instructions: "Conventional commit format: type(scope): description"
+
+  review_status: true
+  commit_status: true
+  poem: false
+
+  suggested_labels: true
+  labeling_instructions:
+    - label: "training"
+      instructions: "Apply when PR modifies training scripts, hyperparams, or notebooks."
+    - label: "data"
+      instructions: "Apply when PR modifies dataset preparation, expert pairs, or data pipeline."
+    - label: "paper"
+      instructions: "Apply when PR modifies LaTeX paper or research notes."
+
+  path_filters:
+    - "!__pycache__/**"
+    - "!**/*.pyc"
+    - "!.venv/**"
+    - "!data/**/*.parquet"
+    - "!**/*.gguf"
+    - "!**/*.safetensors"
+    - "!.ipynb_checkpoints/**"
+
+  path_instructions:
+    - path: "prepare.py"
+      instructions: >-
+        THIS FILE IS IMMUTABLE per program.md constraints. Flag any changes.
+    - path: "train.py"
+      instructions: >-
+        Verify QLoRA hyperparams match program.md: r=16, alpha=32, 4-bit NF4.
+        Check train_on_responses_only is enabled. Verify HF_TOKEN uses env var.
+    - path: "**/*.ipynb"
+      instructions: >-
+        Notebooks must be self-contained. Check for hardcoded tokens or paths.
+        Verify cell outputs are cleared. GPU type must match available resources.
+    - path: "expert_pairs*.py"
+      instructions: >-
+        Check for duplicate pairs. Commands must be valid shell syntax.
+        OS-specific commands should be labeled (macOS vs Linux).
+    - path: "benchmark.py"
+      instructions: >-
+        Verify metrics: charBLEU, template accuracy, exact match.
+        Test set must be 606 examples. No data leakage from training set.
+    - path: "paper/**"
+      instructions: >-
+        Check LaTeX compiles. Verify citations are in nl2shell.bib.
+        Claims must be backed by benchmark results.
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    ignore_title_keywords:
+      - "WIP"
+      - "DRAFT"
+    drafts: false
+
+  tools:
+    ruff:
+      enabled: true
+    gitleaks:
+      enabled: true
+    markdownlint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: "local"
