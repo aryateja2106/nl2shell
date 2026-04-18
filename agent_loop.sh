@@ -28,9 +28,15 @@ LOGS_DIR="$PROJECT_DIR/logs"
 TRAIN_PY="$PROJECT_DIR/train.py"
 PREPARE_PY="$PROJECT_DIR/prepare.py"
 
-# Planning model — proposes and implements changes (big + smart)
-PLAN_MODEL="${PLAN_MODEL:-claude-opus-4.5}"
-# Review model — lightweight post-iteration analysis and retry hints
+# Planning model — proposes and implements changes (big + smart).
+# Must be a model the installed copilot CLI supports. As of 2026-04-18,
+# `copilot --model <x>` accepts: gpt-5.2, gpt-5.4-mini, claude-haiku-4.5.
+# It does NOT accept claude-opus-4.5/4.6/4.7, claude-sonnet-4.6/4.7, gpt-5.3/5.4
+# — using any of those makes every copilot invocation exit non-zero with
+# "Model ... is not available", which silently prevents train.py edits and
+# wastes an entire research iteration.
+PLAN_MODEL="${PLAN_MODEL:-gpt-5.2}"
+# Review model — lightweight post-iteration analysis and retry hints.
 REVIEW_MODEL="${REVIEW_MODEL:-gpt-5.4-mini}"
 # Legacy alias (still accepted)
 if [[ -n "${COPILOT_MODEL:-}" ]]; then PLAN_MODEL="$COPILOT_MODEL"; fi
