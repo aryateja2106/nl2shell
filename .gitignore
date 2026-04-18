@@ -51,3 +51,6 @@ wandb/
 .agents/
 logs/
 results.tsv
+results.tsv.*.bak
+.autoresearch_state.json
+.autoresearch_pid

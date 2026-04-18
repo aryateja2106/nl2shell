@@ -17,6 +17,10 @@
 
 set -uo pipefail
 
+# On SIGINT/SIGTERM write an errored heartbeat so watchers can detect a killed loop.
+# Don't trap EXIT — it would clobber the "completed" state on normal success.
+trap 'write_heartbeat "errored" "" 2>/dev/null || true; exit 130' INT TERM
+
 # ── Config ────────────────────────────────────────────────────────────────────
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 RESULTS_TSV="$PROJECT_DIR/results.tsv"
@@ -62,6 +66,26 @@ fi
 
 mkdir -p "$LOGS_DIR"
 
+# ── Branch guard ──────────────────────────────────────────────────────────────
+CURRENT_BRANCH="$(git -C "$PROJECT_DIR" branch --show-current 2>/dev/null || echo '')"
+if [[ "$CURRENT_BRANCH" == "main" || "$CURRENT_BRANCH" == "master" ]]; then
+  die "Refusing to run on '$CURRENT_BRANCH' — switch to a feature/autoresearch branch first"
+fi
+log "Branch: $CURRENT_BRANCH"
+
+# ── Runtime preflight ─────────────────────────────────────────────────────────
+# A live Colab runtime must exist before we start. Without it, every iteration
+# wastes a copilot call and logs a spurious DISCARD.
+if lecoder-cgpu status 2>&1 | grep -q "No active runtimes"; then
+  log "No active Colab runtime — provisioning A100 (this may take 30-60s)..."
+  lecoder-cgpu run --new-runtime echo "runtime_ready_$(date +%s)" 2>&1 \
+    | tee "$LOGS_DIR/runtime_bootstrap.log" \
+    || die "Failed to provision Colab runtime — run 'lecoder-cgpu connect --new-runtime' manually to diagnose"
+  log "Runtime ready"
+else
+  log "Reusing existing Colab runtime"
+fi
+
 # ── Init results.tsv ──────────────────────────────────────────────────────────
 if [[ ! -f "$RESULTS_TSV" ]]; then
   echo -e "timestamp\titeration\tloss\teval_pass\ttrain_time_s\tscore\tstatus\tdescription" > "$RESULTS_TSV"
@@ -79,8 +103,43 @@ get_best_loss() {
 }
 
 get_baseline_loss() {
-  # First KEEP row's loss is the baseline for normalization
-  awk -F'\t' 'NR==2 && $7 == "KEEP" { print $3; exit } END { if (!found) print "9999" }' "$RESULTS_TSV"
+  # First KEEP row's loss is the baseline for normalization.
+  # Walk the whole file — old version only checked NR==2 so if iter 1 was DISCARD
+  # (as all prior runs were) baseline never materialized.
+  awk -F'\t' 'BEGIN{found=0} $7=="KEEP" && !found {print $3; found=1; exit} END{if(!found) print "9999"}' "$RESULTS_TSV"
+}
+
+write_heartbeat() {
+  # Write .autoresearch_state.json so external watchers (/loop wake-ups) can check
+  # progress without parsing logs. Overwritten every iteration.
+  local phase="$1"          # starting | iteration | completed | errored
+  local last_status="$2"    # KEEP | DISCARD | '' (unknown)
+  local state_file="$PROJECT_DIR/.autoresearch_state.json"
+  local now; now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  local best_score best_loss
+  best_score="$(get_best_score)"
+  best_loss="$(get_best_loss)"
+  # Escape description for JSON (strip backslashes/quotes/newlines).
+  local desc_safe
+  desc_safe="$(printf '%s' "${CHANGE_DESC:-}" | tr -d '\\"' | tr '\n' ' ')"
+  cat > "$state_file" <<JSON
+{
+  "phase": "${phase}",
+  "pid": ${BASHPID:-$$},
+  "branch": "${CURRENT_BRANCH}",
+  "started_at": "${LOOP_STARTED_AT:-$now}",
+  "updated_at": "${now}",
+  "iteration": ${ITERATION:-0},
+  "max_iterations": ${MAX_ITERATIONS},
+  "last_status": "${last_status}",
+  "last_loss": "${LOSS:-}",
+  "last_eval_pass": "${EVAL_PASS:-}",
+  "last_score": "${SCORE:-}",
+  "last_change": "${desc_safe}",
+  "best_score": "${best_score}",
+  "best_loss": "${best_loss}"
+}
+JSON
 }
 
 compute_score() {
@@ -105,7 +164,14 @@ parse_loss() {
 
 parse_eval_pass() {
   # Count CMD lines that contain an actual command (non-empty after "CMD: ")
-  grep -cE '^ +CMD: .+' "$1" || echo 0
+  # Old: `grep -c ... || echo 0` emitted "0\n0" when no matches (grep -c prints 0
+  # AND exits 1), which corrupted the TSV row with an embedded newline.
+  local count
+  count="$(grep -cE '^ +CMD: .+' "$1" 2>/dev/null || true)"
+  # Collapse to a single integer; default to 0 if empty/non-numeric.
+  count="${count%%$'\n'*}"
+  [[ "$count" =~ ^[0-9]+$ ]] || count=0
+  printf '%s' "$count"
 }
 
 parse_train_time() {
@@ -164,6 +230,9 @@ echo ""
 
 ITERATION=0
 LAST_HINT=""  # hint from previous mini-review, fed into next planning prompt
+LOOP_STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+write_heartbeat "starting" ""
+
 while [[ $ITERATION -lt $MAX_ITERATIONS ]]; do
   ITERATION=$((ITERATION + 1))
   TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -223,9 +292,13 @@ while [[ $ITERATION -lt $MAX_ITERATIONS ]]; do
     echo "  CMD: find . -name '*.py' | xargs wc -l" >> "$TRAIN_LOG"
   else
     log "Running train.py on Colab GPU..."
-    # Must pass HF_TOKEN inline — lecoder-cgpu run starts a fresh shell with no local env vars
-    # Files upload to /content/, must use absolute path
-    lecoder-cgpu run bash -c "HF_TOKEN='${HF_TOKEN}' python3 /content/train.py" 2>&1 | tee "$TRAIN_LOG" \
+    # Must pass HF_TOKEN inline — lecoder-cgpu run starts a fresh shell with no local env vars.
+    # Files upload to /content/, must use absolute path.
+    # NB: `bash -c "..."` was broken — lecoder-cgpu's global `-c/--config <path>` option
+    # consumed the `-c` and mis-parsed the whole command as a config-file path, producing
+    # "Missing Colab OAuth credentials" and silent DISCARD on every iteration. Use
+    # `env VAR=value cmd args` instead — no short flags that clash with the CLI.
+    lecoder-cgpu run env "HF_TOKEN=${HF_TOKEN}" python3 /content/train.py 2>&1 | tee "$TRAIN_LOG" \
       || { warn "Training run failed — marking as DISCARD"; TRAIN_FAILED=1; }
   fi
 
@@ -304,7 +377,12 @@ Output only: HINT: <suggestion>"
       fi
     fi
   fi
+
+  # Write heartbeat so /loop wake-ups can check progress without log-grepping.
+  write_heartbeat "iteration" "$([[ $KEEP -eq 1 ]] && echo KEEP || echo DISCARD)"
 done
+
+write_heartbeat "completed" ""
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 echo -e "\n${BOLD}━━━ Autoresearch Complete ━━━${RESET}"
