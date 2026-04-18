@@ -158,8 +158,17 @@ print(f'{score:.4f}')
 
 # ── Parse train output ────────────────────────────────────────────────────────
 parse_loss() {
-  # Matches "  Loss: 0.8234" from train.py output
-  grep 'Loss:' "$1" | grep -oE '[0-9]+\.[0-9]+' | tail -1
+  # Try the final "  Loss: X.XXXX" line train.py prints after trainer.train()
+  # completes normally. If absent — because lecoder-cgpu disconnects mid-training
+  # at the ~17 min mark and Loss: never gets flushed — fall back to the most
+  # recent intermediate "{'loss': '0.XXX', ...}" entry the HF trainer logs every
+  # 10 steps. A cut-short iter still produces a usable score this way.
+  local val
+  val="$(grep -oE 'Loss: [0-9]+\.[0-9]+' "$1" | grep -oE '[0-9]+\.[0-9]+' | tail -1)"
+  if [[ -z "$val" ]]; then
+    val="$(grep -oE "'loss': '[0-9]+\.[0-9]+'" "$1" | grep -oE '[0-9]+\.[0-9]+' | tail -1)"
+  fi
+  printf '%s' "$val"
 }
 
 parse_eval_pass() {

@@ -160,13 +160,17 @@ import math
 from transformers import TrainingArguments
 from trl import SFTTrainer
 
-num_epochs = 3
+num_epochs = 1
 batch_size = 8
 grad_accum = 4
 effective_batch = batch_size * grad_accum
 steps_per_epoch = math.ceil(len(dataset) / effective_batch)
-total_steps = steps_per_epoch * num_epochs
-save_steps = max(steps_per_epoch // 2, 50)
+# Hard cap: lecoder-cgpu disconnects around the 17-min mark and the loop
+# never receives a final exit code. Cap at 150 steps (~10 min training) so
+# the run finishes inside the disconnect window with a usable "Loss:" line.
+max_training_steps = 150
+total_steps = min(steps_per_epoch * num_epochs, max_training_steps)
+save_steps = max(total_steps // 2, 50)
 
 print(f"  Examples:     {len(dataset)}")
 print(f"  Epochs:       {num_epochs}")
@@ -188,6 +192,7 @@ trainer = SFTTrainer(
         gradient_accumulation_steps=grad_accum,
         warmup_steps=20,
         num_train_epochs=num_epochs,
+        max_steps=max_training_steps,
         learning_rate=2e-4,
         fp16=not torch.cuda.is_bf16_supported(),
         bf16=torch.cuda.is_bf16_supported(),
