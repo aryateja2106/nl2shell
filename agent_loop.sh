@@ -334,7 +334,16 @@ while [[ $ITERATION -lt $MAX_ITERATIONS ]]; do
   BEST_EVAL="$(awk -F'\t' '$7 == "KEEP" { best = $4 } END { print (best == "" ? "0" : best) }' "$RESULTS_TSV")"
 
   KEEP=0
-  if python3 -c "exit(0 if float('$SCORE') > float('$BEST_SCORE') else 1)" 2>/dev/null; then
+  # Baseline-seeding rule: the first iteration that successfully parses a loss
+  # MUST be KEPT unconditionally. Otherwise compute_score sets baseline=self,
+  # score=0.0, which never beats best_score=0 (strict >), so the loop can never
+  # establish a baseline and every subsequent iteration DISCARDs regardless of
+  # how good the loss is. BASELINE_LOSS="9999" is the sentinel for "no prior
+  # KEEP exists yet".
+  if [[ "$BASELINE_LOSS" == "9999" ]]; then
+    KEEP=1
+    log "First real iteration — establishing baseline KEEP unconditionally"
+  elif python3 -c "exit(0 if float('$SCORE') > float('$BEST_SCORE') else 1)" 2>/dev/null; then
     if python3 -c "exit(0 if int('$EVAL_PASS') >= int('$BEST_EVAL') else 1)" 2>/dev/null; then
       KEEP=1
     else
